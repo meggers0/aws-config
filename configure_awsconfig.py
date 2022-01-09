@@ -23,13 +23,12 @@ import yaml
 
 # ***CHANGE THESE VARIABLES *** they are dependant on the customer
 CONFIG_S3_BUCKET = "config-bucket-name"  # central config S3 bucket name
-PROFILE = "Role"  # enter your PROFILE name
+PROFILE = "Profile"  # enter your PROFILE name
 FILENAME = "accounts.yaml"
 MAIN_SESSION = boto3.Session(profile_name=PROFILE)
-REGIONS = MAIN_SESSION.client(
-    'ec2', region_name='us-east-1').describe_REGIONS()['REGIONS']
-ACTIVE_REGIONS = list(map(lambda REGIONS: REGIONS['RegionName'], REGIONS))
-print('AWS Config available REGIONS include -->>'+'\n', ACTIVE_REGIONS)
+REGIONS = MAIN_SESSION.client('ec2', region_name='us-east-1').describe_REGIONS()['REGIONS']
+REGION_NAMES = list(map(lambda REGIONS: REGIONS['RegionName'], REGIONS))
+print('AWS Config available REGIONS include -->>'+'\n', REGION_NAMES)
 STS_CLIENT = MAIN_SESSION.client('sts')
 
 
@@ -66,7 +65,7 @@ def configure_and_enable_awsconfig(region, accountid, session):
     """
     This function configures AWS Config for all active REGIONS for an account.
     """
-    config = session.client('config', region_name=region['RegionName'])
+    config = session.client('config', REGION_NAMES=region['RegionName'])
     print("Processing region: " + region['RegionName'])
     config_enabled = config.describe_delivery_channels()['DeliveryChannels']
 
